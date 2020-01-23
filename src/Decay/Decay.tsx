@@ -8,7 +8,23 @@ import { onGestureEvent } from "react-native-redash";
 import { Card, StyleGuide, cards } from "../components";
 import { CARD_HEIGHT, CARD_WIDTH } from "../components/Card";
 
-const { Value, diffClamp, cond, set, eq, add } = Animated;
+const {
+  Value,
+  diffClamp,
+  cond,
+  set,
+  eq,
+  add,
+  not,
+  and,
+  Clock,
+  clockRunning,
+  startClock,
+  stopClock,
+  block,
+  decay,
+  neq
+} = Animated;
 const { width, height } = Dimensions.get("window");
 const containerWidth = width;
 const containerHeight = height - Constants.statusBarHeight - 44;
@@ -23,33 +39,67 @@ const styles = StyleSheet.create({
 const [card] = cards;
 
 // TODO: replace with withOffset from redash
-const withOffset = (
+const withDecay = (
   value: Animated.Node<number>,
-  state: Animated.Value<State>,
-  offset: Animated.Value<number> = new Value(0)
-) =>
-  cond(
-    eq(state, State.END),
-    [set(offset, add(offset, value)), offset],
-    add(offset, value)
-  );
+  gestureState: Animated.Value<State>,
+  offset: Animated.Value<number> = new Value(0),
+  velocity: Animated.Value<number>
+) => {
+  const state = {
+    finished: new Value(0),
+    velocity,
+    position: new Value(0),
+    time: new Value(0)
+  };
+  const deceleration = 0.998;
+
+  const clock = new Clock();
+
+  const isDecayInterrupted = eq(gestureState, State.BEGAN);
+  const finishDecay = [set(offset, state.position), stopClock(clock)];
+
+  return block([
+    cond(isDecayInterrupted, finishDecay),
+    cond(neq(gestureState, State.END), [
+      set(state.finished, 0),
+      set(state.position, add(offset, value))
+    ]),
+    cond(
+      eq(gestureState, State.END),
+      [
+        cond(and(not(clockRunning(clock)), not(state.finished)), [
+          set(state.time, 0),
+          startClock(clock)
+        ]),
+        decay(clock, state, { deceleration }),
+        cond(state.finished, finishDecay)
+      ],
+      [set(state.finished, 0), set(state.position, add(offset, value))]
+    ),
+    state.position
+  ]);
+};
 
 export default () => {
   const state = new Value(State.UNDETERMINED);
   const translationX = new Value(0);
   const translationY = new Value(0);
+  const velocityX = new Value(0);
+  const velocityY = new Value(0);
   const gestureHandler = onGestureEvent({
     state,
     translationX,
-    translationY
+    translationY,
+    velocityX,
+    velocityY
   });
   const translateX = diffClamp(
-    withOffset(translationX, state, offsetX),
+    withDecay(translationX, state, offsetX, velocityX),
     0,
     containerWidth - CARD_WIDTH
   );
   const translateY = diffClamp(
-    withOffset(translationY, state, offsetY),
+    withDecay(translationY, state, offsetY, velocityY),
     0,
     containerHeight - CARD_HEIGHT
   );
