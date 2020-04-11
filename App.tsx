@@ -17,6 +17,8 @@ import DragToSort from "./src/DragToSort";
 import Swipe, { profiles } from "./src/Swipe";
 import Svg from "./src/Svg";
 import Trigonometry from "./src/Trigonometry";
+import CircularSlider from "./src/CircularSlider";
+import BezierCurves from "./src/BezierCurves";
 
 const fonts = {
   "SFProText-Bold": require("./assets/fonts/SF-Pro-Text-Bold.otf"),
@@ -34,89 +36,17 @@ const assets = [
 const AppNavigator = createAppContainer(
   createStackNavigator(
     {
-      Examples: {
-        screen: Examples,
+      CircularSlider: {
+        screen: CircularSlider,
         navigationOptions: {
-          title: "Gestures & Animations",
-          headerBackTitle: null
+          title: "Circular Slider"
         }
       },
-      ClockValuesAndIdentities: {
-        screen: ClockValuesAndIdentities,
+      BezierCurves: {
+        screen: BezierCurves,
         navigationOptions: {
-          title: "Clock Values & Identities"
-        }
-      },
-      Transitions: {
-        screen: Transitions,
-        navigationOptions: {
-          title: "Transitions"
-        }
-      },
-      useTransition: {
-        screen: UseTransition,
-        navigationOptions: {
-          title: "useTransition()"
-        }
-      },
-      DarkMode: {
-        screen: DarkMode,
-        navigationOptions: {
-          title: "Dark Mode"
-        }
-      },
-      Timing: {
-        screen: Timing,
-        navigationOptions: {
-          title: "Timing"
-        }
-      },
-      PanGesture: {
-        screen: PanGesture,
-        navigationOptions: {
-          title: "Pan Gesture"
-        }
-      },
-      Decay: {
-        screen: Decay,
-        navigationOptions: {
-          title: "Decay"
-        }
-      },
-      Spring: {
-        screen: Spring,
-        navigationOptions: {
-          title: "Spring"
-        }
-      },
-      Swipe: {
-        screen: Swipe,
-        navigationOptions: {
-          title: "Swipe"
-        }
-      },
-      DynamicSpring: {
-        screen: DynamicSpring,
-        navigationOptions: {
-          title: "Dynamic Spring"
-        }
-      },
-      DragToSort: {
-        screen: DragToSort,
-        navigationOptions: {
-          title: "Drag to Sort"
-        }
-      },
-      Svg: {
-        screen: Svg,
-        navigationOptions: {
-          title: "SVG"
-        }
-      },
-      Trigonometry: {
-        screen: Trigonometry,
-        navigationOptions: {
-          title: "Trigonometry"
+          title: "Bezier Curves",
+          gesturesEnabled: false
         }
       }
     },
