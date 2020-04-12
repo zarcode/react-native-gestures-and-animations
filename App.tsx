@@ -36,12 +36,6 @@ const assets = [
 const AppNavigator = createAppContainer(
   createStackNavigator(
     {
-      CircularSlider: {
-        screen: CircularSlider,
-        navigationOptions: {
-          title: "Circular Slider"
-        }
-      },
       BezierCurves: {
         screen: BezierCurves,
         navigationOptions: {
