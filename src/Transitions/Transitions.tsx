@@ -1,23 +1,12 @@
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
+import { Dimensions, ImageStyle, StyleSheet, ViewStyle } from "react-native";
 import {
-  Dimensions,
-  ImageStyle,
-  StyleSheet,
-  View,
-  ViewStyle
-} from "react-native";
-
-import {
-  FlexibleCard as Card,
-  StyleGuide,
-  cards,
-  Selection
-} from "../components";
-import {
-  Transitioning,
   Transition,
+  Transitioning,
   TransitioningView
 } from "react-native-reanimated";
+
+import { FlexibleCard, Selection, StyleGuide, cards } from "../components";
 
 interface Layout {
   id: string;
@@ -28,75 +17,81 @@ interface Layout {
   };
 }
 const { width } = Dimensions.get("window");
-
+const transition = (
+  <Transition.Change interpolation="easeInOut" durationMs={400} />
+);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: StyleGuide.palette.background
   }
 });
-
-const column: Layout = {
-  id: "column",
-  name: "Column",
-  layout: {
-    container: {}
-  }
-};
-
-const row: Layout = {
-  id: "row",
-  name: "Row",
-  layout: {
-    container: { flexDirection: "row", alignItems: "center" }
-  }
-};
-
-const wrap: Layout = {
-  id: "wrap",
-  name: "Wrap",
-  layout: {
-    container: {
-      flexDirection: "row",
-      flexWrap: "wrap"
-    },
-    child: {
-      flex: 0,
-      width: width / 2 - StyleGuide.spacing * 2
+const layouts: Layout[] = [
+  {
+    id: "column",
+    name: "Column",
+    layout: {
+      container: {
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center"
+      }
+    }
+  },
+  {
+    id: "row",
+    name: "Row",
+    layout: {
+      container: {
+        flexDirection: "row",
+        alignItems: "center"
+      }
+    }
+  },
+  {
+    id: "wrap",
+    name: "Wrap",
+    layout: {
+      container: {
+        flexDirection: "row",
+        flexWrap: "wrap"
+      },
+      child: {
+        flex: 0,
+        width: width / 2 - StyleGuide.spacing * 2
+      }
     }
   }
-};
-
-const layouts = [column, row, wrap];
+];
 
 export default () => {
-  const [currentLayout, setCurrentLayout] = useState(layouts[0].layout);
   const ref = useRef<TransitioningView>(null);
-  const transition = (
-    <Transition.Change durationMs={400} interpolation="easeInOut" />
-  );
-
+  const [selectedLayout, setLayout] = useState(layouts[0].layout);
   return (
     <>
       <Transitioning.View
-        style={[styles.container, currentLayout.container]}
-        {...{ ref, transition }}
+        style={[styles.container, selectedLayout.container]}
+        {...{ transition, ref }}
       >
         {cards.map(card => (
-          <Card key={card.id} style={currentLayout.child} {...{ card }} />
+          <FlexibleCard
+            key={card.id}
+            style={selectedLayout.child}
+            {...{ card }}
+          />
         ))}
       </Transitioning.View>
-      {layouts.map(layout => (
+      {layouts.map(({ id, name, layout }) => (
         <Selection
-          key={layout.id}
-          name={layout.name}
-          isSelected={currentLayout === layout.layout}
+          key={id}
           onPress={() => {
             if (ref.current) {
               ref.current.animateNextTransition();
             }
-            setCurrentLayout(layout.layout);
+            setLayout(layout);
           }}
+          isSelected={selectedLayout === layout}
+          {...{ name }}
         />
       ))}
     </>

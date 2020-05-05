@@ -3,17 +3,18 @@ import { Dimensions, StyleSheet, View } from "react-native";
 import Animated, { Easing } from "react-native-reanimated";
 import {
   bInterpolate,
-  // transformOrigin,
+  transformOrigin,
   useTimingTransition
 } from "react-native-redash";
 
 import { Button, Card, StyleGuide, cards } from "../components";
 
-const { multiply, interpolate, not } = Animated;
+const { multiply, interpolate } = Animated;
 const { width } = Dimensions.get("window");
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: StyleGuide.palette.background,
     justifyContent: "flex-end"
   },
   overlay: {
@@ -23,11 +24,10 @@ const styles = StyleSheet.create({
     padding: StyleGuide.spacing * 4
   }
 });
-
-const transformOrigin = -(width / 2 - StyleGuide.spacing * 2);
+const newOrigin = -(width / 2 - StyleGuide.spacing * 2);
 
 export default () => {
-  const [toggled, setToggled] = useState(false);
+  const [toggled, setToggle] = useState(false);
   const transitionVal = useTimingTransition(toggled, {
     duration: 400,
     easing: Easing.inOut(Easing.ease)
@@ -41,10 +41,7 @@ export default () => {
         });
         const rotate = multiply(
           rotation,
-          interpolate(transitionVal, {
-            inputRange: [0, 1],
-            outputRange: [0, Math.PI / 6]
-          })
+          bInterpolate(transitionVal, 0, Math.PI / 6)
         );
         return (
           <Animated.View
@@ -52,13 +49,7 @@ export default () => {
             style={[
               styles.overlay,
               {
-                transform: [
-                  { translateX: transformOrigin },
-                  {
-                    rotate
-                  },
-                  { translateX: -transformOrigin }
-                ]
+                transform: transformOrigin({ x: newOrigin, y: 0 }, { rotate })
               }
             ]}
           >
@@ -69,7 +60,7 @@ export default () => {
       <Button
         label={toggled ? "Reset" : "Start"}
         primary
-        onPress={() => setToggled(prev => !prev)}
+        onPress={() => setToggle(prev => !prev)}
       />
     </View>
   );

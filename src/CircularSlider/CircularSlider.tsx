@@ -6,7 +6,6 @@ import { interpolateColor } from "react-native-redash";
 import Cursor from "./Cursor";
 import { StyleGuide } from "../components";
 import CircularProgress from "./CircularProgress";
-import CircularProgressSVG from "./CircularProgressSVG";
 
 const { Value, sub, add, cond, lessThan } = Animated;
 const { PI } = Math;
@@ -33,11 +32,10 @@ export default () => {
     cond(lessThan(start, end), end, add(end, Math.PI * 2)),
     start
   );
-  // const backgroundColor = interpolateColor(theta, {
-  //   inputRange: [0, PI, 2 * PI],
-  //   outputRange: ["#ff3884", StyleGuide.palette.primary, "#38ffb3"]
-  // });
-  const backgroundColor = "#38ffb3";
+  const backgroundColor = interpolateColor(theta, {
+    inputRange: [0, PI, 2 * PI],
+    outputRange: ["#ff3884", StyleGuide.palette.primary, "#38ffb3"]
+  });
   const rotate = sub(PI, end);
   return (
     <View style={styles.container}>
@@ -45,7 +43,7 @@ export default () => {
         <Animated.View
           style={{ ...StyleSheet.absoluteFillObject, transform: [{ rotate }] }}
         >
-          <CircularProgressSVG
+          <CircularProgress
             bg={StyleGuide.palette.background}
             fg={backgroundColor}
             strokeWidth={STROKE_WIDTH}

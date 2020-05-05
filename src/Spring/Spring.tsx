@@ -4,26 +4,11 @@ import { PanGestureHandler, State } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import Constants from "expo-constants";
 
-import { onGestureEvent, clamp } from "react-native-redash";
-import { Card, StyleGuide, cards } from "../components";
+import { onGestureEvent } from "react-native-redash";
+import { Card, StyleGuide, cards, withSpring } from "../components";
 import { CARD_HEIGHT, CARD_WIDTH } from "../components/Card";
 
-const {
-  Clock,
-  Value,
-  cond,
-  set,
-  eq,
-  add,
-  spring,
-  clockRunning,
-  startClock,
-  stopClock,
-  block,
-  and,
-  not,
-  neq
-} = Animated;
+const { Value } = Animated;
 const { width, height } = Dimensions.get("window");
 const containerWidth = width;
 const containerHeight = height - Constants.statusBarHeight - 44;
@@ -39,55 +24,6 @@ const styles = StyleSheet.create({
 });
 const [card] = cards;
 
-const withSpring = (
-  value: Animated.Value<number>,
-  velocity: Animated.Value<number>,
-  gestureState: Animated.Value<State>,
-  offset: Animated.Value<number>,
-  snapPoint: number
-) => {
-  const clock = new Clock();
-  const state = {
-    finished: new Value(0),
-    velocity: new Value(0),
-    position: new Value(0),
-    time: new Value(0)
-  };
-  const config = {
-    damping: 10,
-    mass: 1,
-    stiffness: 100,
-    overshootClamping: false,
-    restSpeedThreshold: 0.001,
-    restDisplacementThreshold: 0.001,
-    toValue: snapPoint
-  };
-
-  const isDecayInterrupted = and(
-    eq(gestureState, State.BEGAN),
-    clockRunning(clock)
-  );
-  const finishDecay = [set(offset, state.position), stopClock(clock)];
-
-  return block([
-    cond(isDecayInterrupted, finishDecay),
-    cond(
-      eq(gestureState, State.END),
-      [
-        cond(and(not(clockRunning(clock)), not(state.finished)), [
-          set(state.velocity, velocity),
-          set(state.time, 0),
-          startClock(clock)
-        ]),
-        spring(clock, state, config),
-        cond(state.finished, finishDecay)
-      ],
-      [set(state.finished, 0), set(state.position, add(offset, value))]
-    ),
-    state.position
-  ]);
-};
-
 export default () => {
   const state = new Value(State.UNDETERMINED);
   const translationX = new Value(0);
@@ -101,16 +37,20 @@ export default () => {
     velocityX,
     velocityY
   });
-  const translateX = clamp(
-    withSpring(translationX, velocityX, state, offsetX, snapX),
-    0,
-    containerWidth - CARD_WIDTH
-  );
-  const translateY = clamp(
-    withSpring(translationY, velocityY, state, offsetY, snapY),
-    0,
-    containerHeight - CARD_HEIGHT
-  );
+  const translateX = withSpring({
+    value: translationX,
+    velocity: velocityX,
+    state,
+    offset: offsetX,
+    snapPoints: [snapX]
+  });
+  const translateY = withSpring({
+    value: translationY,
+    velocity: velocityY,
+    state,
+    offset: offsetY,
+    snapPoints: [snapY]
+  });
   return (
     <View style={styles.container}>
       <PanGestureHandler {...gestureHandler}>

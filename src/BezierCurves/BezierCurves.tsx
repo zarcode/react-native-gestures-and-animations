@@ -2,12 +2,11 @@ import React from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import Svg, { Line, Path } from "react-native-svg";
 import Animated from "react-native-reanimated";
-import { StyleGuide } from "../components";
+
 import ControlPoint from "./ControlPoint";
+import { StyleGuide } from "../components";
 
 const { Value, concat } = Animated;
-const AnimatedPath = Animated.createAnimatedComponent(Path);
-const AnimatedLine = Animated.createAnimatedComponent(Line);
 const { width } = Dimensions.get("window");
 const size = width - 48;
 const STROKE_WIDTH = 4;
@@ -22,7 +21,8 @@ const styles = StyleSheet.create({
     height: size + STROKE_WIDTH
   }
 });
-
+const AnimatedPath = Animated.createAnimatedComponent(Path);
+const AnimatedLine = Animated.createAnimatedComponent(Line);
 export default () => {
   const min = STROKE_WIDTH / 2;
   const max = min + size;
@@ -34,14 +34,12 @@ export default () => {
     x: max,
     y: min
   };
-
   const c1x = new Value(0);
   const c1y = new Value(0);
   const c2x = new Value(0);
   const c2y = new Value(0);
-
   const d = concat(
-    `M ${start.x} ${start.y} C`,
+    `M ${start.x} ${start.y} C `,
     c1x,
     " ",
     c1y,
@@ -49,8 +47,7 @@ export default () => {
     c2x,
     " ",
     c2y,
-    ", ",
-    `${end.x} ${end.y}`
+    `, ${end.x} ${end.y}`
   );
   return (
     <View style={styles.container}>
@@ -68,19 +65,29 @@ export default () => {
             x2={c1x}
             y2={c1y}
             stroke="black"
-            strokeWidth={STROKE_WIDTH}
+            strokeWidth={STROKE_WIDTH / 2}
           />
           <AnimatedLine
-            x2={c2x}
-            y2={c2y}
             x1={end.x}
             y1={end.y}
+            x2={c2x}
+            y2={c2y}
             stroke="black"
-            strokeWidth={STROKE_WIDTH}
+            strokeWidth={STROKE_WIDTH / 2}
           />
         </Svg>
-        <ControlPoint point={{ x: c1x, y: c1y }} {...{ min, max }} />
-        <ControlPoint point={{ x: c2x, y: c2y }} {...{ min, max }} />
+        <ControlPoint
+          point={{ x: c1x, y: c1y }}
+          defaultPoint={{ x: min, y: min }}
+          backgroundColor={StyleGuide.palette.tertiary}
+          {...{ min, max }}
+        />
+        <ControlPoint
+          point={{ x: c2x, y: c2y }}
+          defaultPoint={{ x: max, y: max }}
+          backgroundColor={StyleGuide.palette.secondary}
+          {...{ min, max }}
+        />
       </View>
     </View>
   );

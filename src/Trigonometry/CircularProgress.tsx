@@ -1,25 +1,24 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
+import Animated from "react-native-reanimated";
 import Svg, { Circle } from "react-native-svg";
 import Color from "color";
 import { Feather as Icon } from "@expo/vector-icons";
-import Animated from "react-native-reanimated";
-import { bInterpolate } from "react-native-redash";
 
 export const STROKE_WIDTH = 40;
-const { multiply } = Animated;
-
+const { PI } = Math;
+const { multiply, sub } = Animated;
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "center"
   },
   svg: {
-    transform: [{ rotate: "-90deg" }],
-  },
+    transform: [{ rotateZ: "270deg" }]
+  }
 });
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 interface CircularProgressProps {
   icon: string;
@@ -30,28 +29,53 @@ interface CircularProgressProps {
 
 export default ({ color, size, progress, icon }: CircularProgressProps) => {
   const r = (size - STROKE_WIDTH) / 2;
+  const circumference = r * 2 * PI;
+  const α = multiply(sub(1, progress), PI * 2);
+  const strokeDashoffset = multiply(α, r);
+  const backgroundColor = new Color(color).darken(0.8);
   const cx = size / 2;
   const cy = size / 2;
-  const circum = 2 * r * Math.PI;
-  const alfa = bInterpolate(progress, 0, 2 * Math.PI);
-  const strokeDashoffset = multiply(alfa, r);
   return (
     <View style={styles.container}>
       <Svg style={styles.svg} width={size} height={size}>
+        <Circle
+          stroke={backgroundColor.string()}
+          fill="none"
+          strokeWidth={STROKE_WIDTH}
+          {...{
+            cx,
+            cy,
+            r
+          }}
+        />
         <AnimatedCircle
           stroke={color}
           fill="none"
+          strokeDasharray={`${circumference}, ${circumference}`}
           strokeLinecap="round"
-          strokeDasharray={`${circum} ${circum}`}
           strokeWidth={STROKE_WIDTH}
           {...{
             strokeDashoffset,
             cx,
             cy,
-            r,
+            r
           }}
         />
       </Svg>
+      <View
+        style={{
+          ...StyleSheet.absoluteFillObject,
+          justifyContent: "center",
+          alignItems: "center"
+        }}
+      >
+        <Icon
+          name={icon}
+          style={{ top: -r }}
+          color="black"
+          size={STROKE_WIDTH}
+        />
+      </View>
     </View>
   );
 };

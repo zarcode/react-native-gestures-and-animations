@@ -2,8 +2,8 @@ import * as React from "react";
 import { StyleSheet } from "react-native";
 import Animated from "react-native-reanimated";
 import { PanGestureHandler, State } from "react-native-gesture-handler";
+import { canvas2Polar, polar2Canvas } from "./Coordinates";
 import { withOffset } from "../components";
-import { canvas2Polar, polar2Canvas } from "react-native-redash";
 
 const { Value, block, event, set, useCode } = Animated;
 

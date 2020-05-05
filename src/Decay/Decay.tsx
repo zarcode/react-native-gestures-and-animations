@@ -9,20 +9,20 @@ import { Card, StyleGuide, cards } from "../components";
 import { CARD_HEIGHT, CARD_WIDTH } from "../components/Card";
 
 const {
+  Clock,
   Value,
   diffClamp,
   cond,
   set,
   eq,
   add,
-  not,
-  and,
-  Clock,
+  decay: reDecay,
   clockRunning,
   startClock,
   stopClock,
   block,
-  decay,
+  and,
+  not,
   neq
 } = Animated;
 const { width, height } = Dimensions.get("window");
@@ -38,45 +38,47 @@ const styles = StyleSheet.create({
 });
 const [card] = cards;
 
-// TODO: replace with withOffset from redash
-const withDecay = (
-  value: Animated.Node<number>,
-  gestureState: Animated.Value<State>,
-  offset: Animated.Value<number> = new Value(0),
-  velocity: Animated.Value<number>
-) => {
-  const state = {
+interface WithDecayProps {
+  value: Animated.Adaptable<number>;
+  velocity: Animated.Adaptable<number>;
+  state: Animated.Value<State>;
+  offset?: Animated.Value<number>;
+  deceleration?: number;
+}
+
+const withDecay = (config: WithDecayProps) => {
+  const { value, velocity, state, offset, deceleration } = {
+    offset: new Value(0),
+    deceleration: 0.998,
+    ...config
+  };
+  const clock = new Clock();
+  const decayState = {
     finished: new Value(0),
-    velocity,
+    velocity: new Value(0),
     position: new Value(0),
     time: new Value(0)
   };
-  const deceleration = 0.998;
 
-  const clock = new Clock();
-
-  const isDecayInterrupted = eq(gestureState, State.BEGAN);
-  const finishDecay = [set(offset, state.position), stopClock(clock)];
+  const isDecayInterrupted = and(eq(state, State.BEGAN), clockRunning(clock));
+  const finishDecay = [set(offset, decayState.position), stopClock(clock)];
 
   return block([
     cond(isDecayInterrupted, finishDecay),
-    cond(neq(gestureState, State.END), [
-      set(state.finished, 0),
-      set(state.position, add(offset, value))
+    cond(neq(state, State.END), [
+      set(decayState.finished, 0),
+      set(decayState.position, add(offset, value))
     ]),
-    cond(
-      eq(gestureState, State.END),
-      [
-        cond(and(not(clockRunning(clock)), not(state.finished)), [
-          set(state.time, 0),
-          startClock(clock)
-        ]),
-        decay(clock, state, { deceleration }),
-        cond(state.finished, finishDecay)
-      ],
-      [set(state.finished, 0), set(state.position, add(offset, value))]
-    ),
-    state.position
+    cond(eq(state, State.END), [
+      cond(and(not(clockRunning(clock)), not(decayState.finished)), [
+        set(decayState.velocity, velocity),
+        set(decayState.time, 0),
+        startClock(clock)
+      ]),
+      reDecay(clock, decayState, { deceleration }),
+      cond(decayState.finished, finishDecay)
+    ]),
+    decayState.position
   ]);
 };
 
@@ -94,12 +96,22 @@ export default () => {
     velocityY
   });
   const translateX = diffClamp(
-    withDecay(translationX, state, offsetX, velocityX),
+    withDecay({
+      value: translationX,
+      velocity: velocityX,
+      state,
+      offset: offsetX
+    }),
     0,
     containerWidth - CARD_WIDTH
   );
   const translateY = diffClamp(
-    withDecay(translationY, state, offsetY, velocityY),
+    withDecay({
+      value: translationY,
+      velocity: velocityY,
+      state,
+      offset: offsetY
+    }),
     0,
     containerHeight - CARD_HEIGHT
   );

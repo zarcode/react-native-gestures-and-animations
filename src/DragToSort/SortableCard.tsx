@@ -8,6 +8,7 @@ import Card, {
   CardProps,
   CARD_HEIGHT as INNER_CARD_HEIGHT
 } from "../components/Card";
+import { withOffset, withTransition } from "../components";
 
 export const CARD_HEIGHT = INNER_CARD_HEIGHT + 32;
 const { width } = Dimensions.get("window");
@@ -17,8 +18,7 @@ const {
   cond,
   useCode,
   divide,
-  floor,
-  max,
+  round,
   multiply,
   block,
   set,
@@ -28,95 +28,75 @@ const {
   greaterThan,
   abs,
   not,
-  startClock,
-  spring,
-  Clock
+  and,
+  neq
 } = Animated;
+
+const isMoving = (position: Animated.Node<number>) => {
+  const delta = diff(position);
+  const noMovementFrames = new Value(0);
+  return cond(
+    lessThan(abs(delta), 1e-3),
+    [
+      set(noMovementFrames, add(noMovementFrames, 1)),
+      not(greaterThan(noMovementFrames, 20))
+    ],
+    [set(noMovementFrames, 0), 1]
+  );
+};
 
 interface SortableCardProps extends CardProps {
   offsets: Animated.Value<number>[];
   index: number;
 }
 
-const withOffset = (
-  value: Animated.Value<number>,
-  state: Animated.Value<State>,
-  offset: Animated.Value<number>
-) => {
-  const safeOffset = new Value(0);
-  return cond(eq(state, State.ACTIVE), add(safeOffset, value), [
-    set(safeOffset, offset),
-    safeOffset
-  ]);
-};
-
-const withTransition = (
-  value: Animated.Node<number>,
-  velocity: Animated.Value<number>,
-  gestureState: Animated.Value<State> = new Value(State.UNDETERMINED),
-  springConfig?: Partial<Omit<Animated.SpringConfig, "toValue">>
-) => {
-  const clock = new Clock();
-  const state = {
-    finished: new Value(0),
-    velocity: new Value(0),
-    position: new Value(0),
-    time: new Value(0)
-  };
-  const config = {
-    toValue: new Value(0),
-    damping: 15,
-    mass: 1,
-    stiffness: 150,
-    overshootClamping: false,
-    restSpeedThreshold: 1,
-    restDisplacementThreshold: 1,
-    ...springConfig
-  };
-  return block([
-    startClock(clock),
-    set(config.toValue, value),
-    // spring(clock, state, config),
-    cond(
-      eq(gestureState, State.ACTIVE),
-      [set(state.velocity, velocity), set(state.position, value)],
-      spring(clock, state, config)
-    ),
-    state.position
-  ]);
-};
-
 export default ({ card, index, offsets }: SortableCardProps) => {
   const {
     gestureHandler,
     translationX,
-    velocityX,
     translationY,
     velocityY,
+    velocityX,
     state
   } = panGestureHandler();
-  const zIndex = cond(eq(state, State.ACTIVE), 100, 1);
-
-  const x = withOffset(translationX, state, 0);
+  const x = withOffset({
+    offset: 0,
+    value: translationX,
+    state
+  });
   const translateX = withTransition(x, velocityX, state);
-  const y = withOffset(translationY, state, offsets[index]);
-  const currentOffset = multiply(
-    max(floor(divide(y, CARD_HEIGHT)), 0),
-    CARD_HEIGHT
-  );
+  const y = withOffset({
+    offset: offsets[index],
+    value: translationY,
+    state
+  });
   const translateY = withTransition(y, velocityY, state);
-
+  const zIndex = cond(
+    eq(state, State.ACTIVE),
+    200,
+    cond(isMoving(translateY), 100, 1)
+  );
+  const currentIndex = round(divide(y, CARD_HEIGHT));
+  const currentOffset = multiply(currentIndex, CARD_HEIGHT);
   useCode(
     () =>
-      block(
-        offsets.map(offset =>
-          cond(eq(offset, currentOffset), [
-            set(offset, offsets[index]),
-            set(offsets[index], currentOffset)
-          ])
+      block([
+        ...offsets.map(offset =>
+          cond(
+            and(
+              eq(currentOffset, offset),
+              neq(currentOffset, offsets[index]),
+              eq(state, State.ACTIVE)
+            ),
+            [
+              set(offset, offsets[index]),
+              set(offsets[index], currentOffset)
+              // call([currentOffset], c => console.log(`set new order: ${c}`))
+            ]
+          )
         )
-      ),
-    []
+      ]),
+    [currentOffset, index, offsets, state]
   );
   return (
     <PanGestureHandler {...gestureHandler}>
@@ -129,8 +109,13 @@ export default ({ card, index, offsets }: SortableCardProps) => {
           height: CARD_HEIGHT,
           justifyContent: "center",
           alignItems: "center",
-          transform: [{ translateY }, { translateX }],
-          zIndex
+          zIndex,
+          transform: [
+            { translateX },
+            {
+              translateY
+            }
+          ]
         }}
       >
         <Card {...{ card }} />

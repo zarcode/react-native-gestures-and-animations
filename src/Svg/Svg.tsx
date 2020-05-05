@@ -2,27 +2,26 @@ import React from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import Svg, { Ellipse } from "react-native-svg";
 import Constants from "expo-constants";
-import Animated from "react-native-reanimated";
+
 import { PanGestureHandler, State } from "react-native-gesture-handler";
+import Animated from "react-native-reanimated";
 import { onGestureEvent } from "react-native-redash";
+import { StyleGuide, withTransition } from "../components";
 
-import { StyleGuide } from "../components";
-import { withTransition } from "../components/AnimationHelpers";
-
-const AnimatedEllipse = Animated.createAnimatedComponent(Ellipse);
-const { Value, sub, multiply, max, cond, eq, abs } = Animated;
+const { Value, sub, multiply, eq, cond, max, abs } = Animated;
 const { width, height } = Dimensions.get("window");
+const AnimatedEllipse = Animated.createAnimatedComponent(Ellipse);
 const containerWidth = width;
 const containerHeight = height - Constants.statusBarHeight - 44;
 const center = {
   x: containerWidth / 2,
-  y: containerHeight / 2,
+  y: containerHeight / 2
 };
 const radius = 100;
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
+    flex: 1
+  }
 });
 
 const canvas2Euclidean = (
@@ -31,7 +30,7 @@ const canvas2Euclidean = (
 ) => {
   return {
     rx: sub(x, center.x),
-    ry: multiply(-1, sub(y, center.y)),
+    ry: multiply(sub(y, center.y), -1)
   };
 };
 
@@ -46,7 +45,7 @@ export default () => {
     y,
     velocityX,
     velocityY,
-    state,
+    state
   });
   const isActive = eq(state, State.ACTIVE);
   const targetX = cond(isActive, x, center.x);
@@ -67,7 +66,7 @@ export default () => {
         />
       </Svg>
       <PanGestureHandler {...gestureHandler}>
-        <Animated.View style={StyleSheet.absoluteFill}></Animated.View>
+        <Animated.View style={StyleSheet.absoluteFill} />
       </PanGestureHandler>
     </View>
   );

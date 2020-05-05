@@ -1,24 +1,39 @@
-import * as React from "react";
+import React from "react";
 import { StyleSheet } from "react-native";
 import Animated from "react-native-reanimated";
 import { PanGestureHandler, State } from "react-native-gesture-handler";
 import { withOffset } from "../components";
-import { canvas2Polar, polar2Canvas } from "react-native-redash";
 
-const { Value, block, event, set, useCode, sub, diffClamp } = Animated;
+const { Value, event, useCode, block, set, diffClamp, sub } = Animated;
+export const CONTROL_POINT_RADIUS = 20;
 
-interface ControlPoint {
-  point: {
-    x: Animated.Value<number>;
-    y: Animated.Value<number>;
-  };
+interface AnimatedPoint {
+  x: Animated.Value<number>;
+  y: Animated.Value<number>;
+}
+
+interface Point {
+  x: number;
+  y: number;
+}
+
+interface ControlPointProps {
+  point: AnimatedPoint;
+  defaultPoint: Point;
+  backgroundColor: string;
   min: number;
   max: number;
 }
 
-export default ({ point: { x, y }, min, max }: ControlPoint) => {
-  const translationX = new Value(0);
-  const translationY = new Value(0);
+export default ({
+  point: { x, y },
+  defaultPoint,
+  min,
+  max,
+  backgroundColor
+}: ControlPointProps) => {
+  const translationX = new Value(defaultPoint.x);
+  const translationY = new Value(defaultPoint.y);
   const state = new Value(State.UNDETERMINED);
   const x1 = withOffset({ value: translationX, state });
   const y1 = withOffset({ value: translationY, state });
@@ -47,16 +62,15 @@ export default ({ point: { x, y }, min, max }: ControlPoint) => {
       <Animated.View
         style={{
           ...StyleSheet.absoluteFillObject,
-          backgroundColor: "blue",
-          width: 30,
-          height: 30,
-          borderRadius: 30 / 2,
+          width: CONTROL_POINT_RADIUS * 2,
+          height: CONTROL_POINT_RADIUS * 2,
+          borderRadius: CONTROL_POINT_RADIUS,
+          borderWidth: 4,
+          backgroundColor,
           transform: [
-            { translateX: sub(translateX, 15) },
-            { translateY: sub(translateY, 15) }
-          ],
-          borderColor: "black",
-          borderWidth: 5
+            { translateX: sub(translateX, CONTROL_POINT_RADIUS) },
+            { translateY: sub(translateY, CONTROL_POINT_RADIUS) }
+          ]
         }}
       />
     </PanGestureHandler>

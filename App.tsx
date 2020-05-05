@@ -36,6 +36,97 @@ const assets = [
 const AppNavigator = createAppContainer(
   createStackNavigator(
     {
+      Examples: {
+        screen: Examples,
+        navigationOptions: {
+          title: "Gestures & Animations",
+          headerBackTitle: null
+        }
+      },
+      ClockValuesAndIdentities: {
+        screen: ClockValuesAndIdentities,
+        navigationOptions: {
+          title: "Clock Values & Identities"
+        }
+      },
+      Transitions: {
+        screen: Transitions,
+        navigationOptions: {
+          title: "Transitions"
+        }
+      },
+      useTransition: {
+        screen: UseTransition,
+        navigationOptions: {
+          title: "useTransition()"
+        }
+      },
+      DarkMode: {
+        screen: DarkMode,
+        navigationOptions: {
+          title: "Dark Mode"
+        }
+      },
+      Timing: {
+        screen: Timing,
+        navigationOptions: {
+          title: "Timing"
+        }
+      },
+      PanGesture: {
+        screen: PanGesture,
+        navigationOptions: {
+          title: "Pan Gesture"
+        }
+      },
+      Spring: {
+        screen: Spring,
+        navigationOptions: {
+          title: "Spring"
+        }
+      },
+      Swipe: {
+        screen: Swipe,
+        navigationOptions: {
+          title: "Swipe"
+        }
+      },
+      DynamicSpring: {
+        screen: DynamicSpring,
+        navigationOptions: {
+          title: "Dynamic Spring"
+        }
+      },
+      DragToSort: {
+        screen: DragToSort,
+        navigationOptions: {
+          title: "Drag to Sort"
+        }
+      },
+      Svg: {
+        screen: Svg,
+        navigationOptions: {
+          title: "SVG"
+        }
+      },
+      Trigonometry: {
+        screen: Trigonometry,
+        navigationOptions: {
+          title: "Trigonometry"
+        }
+      },
+      Decay: {
+        screen: Decay,
+        navigationOptions: {
+          title: "Decay"
+        }
+      },
+      CircularSlider: {
+        screen: CircularSlider,
+        navigationOptions: {
+          title: "Circular Slider"
+        }
+      },
       BezierCurves: {
         screen: BezierCurves,
         navigationOptions: {

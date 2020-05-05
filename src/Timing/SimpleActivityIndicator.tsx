@@ -45,6 +45,11 @@ export default ({ progress }: SimpleActivityIndicatorProps) => {
         {bubbles.map(i => {
           const start = i * delta;
           const end = start + delta;
+          const opacity = interpolate(progress, {
+            inputRange: [start, end],
+            outputRange: [0.5, 1],
+            extrapolate: Extrapolate.CLAMP
+          });
           const scale = interpolate(progress, {
             inputRange: [start, end],
             outputRange: [1, 1.5],
@@ -53,7 +58,7 @@ export default ({ progress }: SimpleActivityIndicatorProps) => {
           return (
             <Animated.View
               key={i}
-              style={[styles.bubble, { transform: [{ scale }] }]}
+              style={[styles.bubble, { opacity, transform: [{ scale }] }]}
             />
           );
         })}
