@@ -33,92 +33,90 @@ interface AmplifyProps {
   onChange: (value: number) => void;
 }
 
-const Amplify = React.memo(
-  ({
-    height: itemsHeight,
-    width: itemWidth,
-    borderRadius: itemBorderRadius,
-    initialValue,
-    onChange,
-  }: AmplifyProps) => {
-    const hasMounted = useRef(false);
-    const initialTranslationY = INITHEIGHT - (initialValue * INITHEIGHT) / 100;
+const Amplify = ({
+  height: itemsHeight,
+  width: itemWidth,
+  borderRadius: itemBorderRadius,
+  initialValue,
+  onChange,
+}: AmplifyProps) => {
+  const hasMounted = useRef(false);
+  const initialTranslationY = INITHEIGHT - (initialValue * INITHEIGHT) / 100;
 
-    const { state, translationY, velocityX, velocityY } = useMemoOne(
-      () => ({
-        state: new Value(State.UNDETERMINED),
-        translationY: new Value(0),
-        velocityX: new Value(0),
-        velocityY: new Value(0),
-      }),
-      []
-    );
+  const { state, translationY, velocityX, velocityY } = useMemoOne(
+    () => ({
+      state: new Value(State.UNDETERMINED),
+      translationY: new Value(0),
+      velocityX: new Value(0),
+      velocityY: new Value(0),
+    }),
+    []
+  );
 
-    useEffect(() => {
-      hasMounted.current = true;
-    }, []);
+  useEffect(() => {
+    hasMounted.current = true;
+  }, []);
 
-    // useEffect(() => {
-    //   translationY.setValue(initialTranslationY);
-    // }, [initialTranslationY]);
+  // useEffect(() => {
+  //   translationY.setValue(initialTranslationY);
+  // }, [initialTranslationY]);
 
-    const gestureHandler = onGestureEvent({
-      state,
-      translationY,
-      velocityX,
-      velocityY,
-    });
+  const gestureHandler = onGestureEvent({
+    state,
+    translationY,
+    velocityX,
+    velocityY,
+  });
 
-    let handler: ReturnType<typeof setTimeout>;
+  let handler: ReturnType<typeof setTimeout>;
 
-    const onSnap = ([x]: readonly number[]) => {
-      if (!hasMounted.current) {
-        return false;
-      }
+  const onSnap = ([x]: readonly number[]) => {
+    if (!hasMounted.current) {
+      return false;
+    }
 
-      clearTimeout(handler);
+    clearTimeout(handler);
 
-      handler = setTimeout(() => {
-        onChange((100 * (INITHEIGHT - x)) / INITHEIGHT);
-      }, 400);
-    };
+    handler = setTimeout(() => {
+      onChange((100 * (INITHEIGHT - x)) / INITHEIGHT);
+    }, 400);
+  };
 
-    // v = 300x/100
+  // v = 300x/100
 
-    const translateY = diffClamp(
-      withOffset(translationY, state, offsetY),
-      0,
-      itemsHeight
-    );
+  const translateY = diffClamp(
+    withOffset(translationY, state, offsetY),
+    0,
+    itemsHeight
+  );
 
-    useCode(() => block([call([translateY], onSnap)]), [translateY]);
+  useCode(() => block([call([translateY], onSnap)]), [translateY]);
 
-    return (
-      <PanGestureHandler {...gestureHandler}>
+  return (
+    <PanGestureHandler {...gestureHandler}>
+      <Animated.View
+        style={{
+          width: itemWidth,
+          height: itemsHeight,
+          backgroundColor: "black",
+          borderRadius: itemBorderRadius,
+          overflow: "hidden",
+        }}
+      >
         <Animated.View
           style={{
+            position: "absolute",
+            left: 0,
+            bottom: 0,
             width: itemWidth,
-            height: itemsHeight,
-            backgroundColor: "black",
-            borderRadius: itemBorderRadius,
-            overflow: "hidden",
+            height: sub(itemsHeight, translateY),
+            backgroundColor: "red",
           }}
-        >
-          <Animated.View
-            style={{
-              position: "absolute",
-              left: 0,
-              bottom: 0,
-              width: itemWidth,
-              height: sub(itemsHeight, translateY),
-              backgroundColor: "red",
-            }}
-          />
-        </Animated.View>
-      </PanGestureHandler>
-    );
-  }
-);
+        />
+      </Animated.View>
+    </PanGestureHandler>
+  );
+};
 
 Amplify.defaultProps = {
   width: INITWIDTH,
@@ -127,4 +125,4 @@ Amplify.defaultProps = {
   initialValue: 0,
 };
 
-export default Amplify;
+export default React.memo(Amplify);

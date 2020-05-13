@@ -30,7 +30,7 @@ interface ControlProps {
   open: (position: Position) => void;
 }
 
-export default ({ open, setValue }: ControlProps) => {
+const Control = ({ open, setValue }: ControlProps) => {
   const item = useRef(null);
 
   const startTransition = async () => {
@@ -64,3 +64,5 @@ export default ({ open, setValue }: ControlProps) => {
     </>
   );
 };
+
+export default Control;

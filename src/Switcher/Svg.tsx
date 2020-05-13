@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
     // justifyContent: "center",
   },
 });
-export default () => {
+const IOSAmply = () => {
   const [position, setPosition] = useState(null);
   const [value, setValue] = useState(0);
 
@@ -47,22 +47,32 @@ export default () => {
   }, [shouldClose, position]);
 
   return (
-    <View style={styles.container}>
-      <View style={{ marginTop: 100, marginLeft: 10 }}>
-        <Control {...{ open, setValue }} />
-      </View>
-      {position !== null && (
-        <Modal
-          {...{
-            close,
-            position,
-            prepareForClose,
-            shouldClose,
+    <React.Profiler
+      id="test1"
+      onRender={(...args) => {
+        // { [1]: phase, [2]: actualDuraction } = args;
+
+        // console.log({ phase, actualDuration })
+        console.log(args);
+      }}
+    >
+      <View style={styles.container}>
+        <View style={{ marginTop: 100, marginLeft: 10 }}>
+          <Control open={open} setValue={setValue} />
+        </View>
+        {position !== null && (
+          <Modal
+            close={close}
+            position={position}
+            prepareForClose={prepareForClose}
+            shouldClose={shouldClose}
             // value,
-            setValue,
-          }}
-        />
-      )}
-    </View>
+            setValue={setValue}
+          />
+        )}
+      </View>
+    </React.Profiler>
   );
 };
+
+export default IOSAmply;
