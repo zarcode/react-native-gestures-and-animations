@@ -44,26 +44,26 @@ const Modal = ({
   value,
   setValue,
 }: ModalProps) => {
-  // const { width, height, x, y, opacity, scale, borderRadius } = useMemoOne(
-  //   () => ({
-  //     width: createValue(position.width),
-  //     height: createValue(position.height),
-  //     x: createValue(position.x),
-  //     y: createValue(position.y),
-  //     opacity: createValue(0),
-  //     scale: createValue(1),
-  //     borderRadius: createValue(6),
-  //   }),
-  //   []
-  // );
+  const { width, height, x, y, opacity, scale, borderRadius } = useMemoOne(
+    () => ({
+      width: createValue(position.width),
+      height: createValue(position.height),
+      x: createValue(position.x),
+      y: createValue(position.y),
+      opacity: createValue(0),
+      scale: createValue(1),
+      borderRadius: createValue(6),
+    }),
+    []
+  );
 
-  const width = createValue(position.width);
-  const height = createValue(position.height);
-  const x = createValue(position.x);
-  const y = createValue(position.y);
-  const opacity = createValue(0);
-  const scale = createValue(1);
-  const borderRadius = createValue(6);
+  // const width = createValue(position.width);
+  // const height = createValue(position.height);
+  // const x = createValue(position.x);
+  // const y = createValue(position.y);
+  // const opacity = createValue(0);
+  // const scale = createValue(1);
+  // const borderRadius = createValue(6);
   const p = {
     position: "absolute",
     width: width.value,
@@ -109,7 +109,7 @@ const Modal = ({
       close,
     ]
   );
-
+  console.log(value);
   return (
     <>
       <TouchableWithoutFeedback onPress={prepareForClose}>
@@ -146,4 +146,4 @@ const Modal = ({
   );
 };
 
-export default React.memo(Modal);
+export default React.memo(Modal, () => true);

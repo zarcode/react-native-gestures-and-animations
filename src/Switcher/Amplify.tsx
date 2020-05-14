@@ -12,8 +12,6 @@ const INITHEIGHT = 300;
 const INITWIDTH = 100;
 const INIT_BORDER_RADIUS = 15;
 
-const offsetY = new Value(0);
-
 const withOffset = (
   value: Animated.Node<number>,
   state: Animated.Value<State>,
@@ -43,18 +41,21 @@ const Amplify = ({
   const hasMounted = useRef(false);
   const initialTranslationY = INITHEIGHT - (initialValue * INITHEIGHT) / 100;
 
-  const { state, translationY, velocityX, velocityY } = useMemoOne(
+  const { state, translationY, velocityX, velocityY, offsetY } = useMemoOne(
     () => ({
       state: new Value(State.UNDETERMINED),
       translationY: new Value(0),
       velocityX: new Value(0),
       velocityY: new Value(0),
+      offsetY: new Value(0),
     }),
     []
   );
 
   useEffect(() => {
-    hasMounted.current = true;
+    setTimeout(() => {
+      hasMounted.current = true;
+    }, 1000);
   }, []);
 
   // useEffect(() => {
@@ -71,6 +72,7 @@ const Amplify = ({
   let handler: ReturnType<typeof setTimeout>;
 
   const onSnap = ([x]: readonly number[]) => {
+    console.log("loaded", hasMounted.current);
     if (!hasMounted.current) {
       return false;
     }

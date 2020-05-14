@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { StyleSheet, View } from "react-native";
 import { useMemoOne } from "use-memo-one";
 import Animated from "react-native-reanimated";
@@ -30,14 +30,22 @@ const IOSAmply = () => {
     setPosition(p);
   };
 
-  const close = () => {
+  // const close = () => {
+  //   // setPosition(null);
+  // };
+
+  const close = useCallback(() => {
     setPosition(null);
-  };
+  }, []);
 
   // prepare for closing
-  const prepareForClose = () => {
+  // const prepareForClose = () => {
+  //   shouldClose.setValue(1);
+  // };
+
+  const prepareForClose = useCallback(() => {
     shouldClose.setValue(1);
-  };
+  }, []);
 
   // when position is set to null prepare for opening
   useEffect(() => {
@@ -46,32 +54,38 @@ const IOSAmply = () => {
     }
   }, [shouldClose, position]);
 
-  return (
-    <React.Profiler
-      id="test1"
-      onRender={(...args) => {
-        // { [1]: phase, [2]: actualDuraction } = args;
+  useEffect(() => {
+    console.log("shouldClose");
+  }, [shouldClose]);
 
-        // console.log({ phase, actualDuration })
-        console.log(args);
-      }}
-    >
-      <View style={styles.container}>
-        <View style={{ marginTop: 100, marginLeft: 10 }}>
-          <Control open={open} setValue={setValue} />
-        </View>
-        {position !== null && (
-          <Modal
-            close={close}
-            position={position}
-            prepareForClose={prepareForClose}
-            shouldClose={shouldClose}
-            // value,
-            setValue={setValue}
-          />
-        )}
+  useEffect(() => {
+    console.log("position", position);
+  }, [position]);
+
+  useEffect(() => {
+    console.log("value", value);
+  }, [value]);
+
+  useEffect(() => {
+    console.log("prepareForClose", prepareForClose);
+  }, [prepareForClose]);
+
+  return (
+    <View style={styles.container}>
+      <View style={{ marginTop: 100, marginLeft: 10 }}>
+        <Control open={open} setValue={setValue} />
       </View>
-    </React.Profiler>
+      {position !== null && (
+        <Modal
+          close={close}
+          position={position}
+          prepareForClose={prepareForClose}
+          shouldClose={shouldClose}
+          value={value}
+          setValue={setValue}
+        />
+      )}
+    </View>
   );
 };
 
