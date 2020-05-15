@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   StyleSheet,
   TouchableWithoutFeedback,
@@ -44,26 +44,30 @@ const Modal = ({
   value,
   setValue,
 }: ModalProps) => {
-  const { width, height, x, y, opacity, scale, borderRadius } = useMemoOne(
-    () => ({
-      width: createValue(position.width),
-      height: createValue(position.height),
-      x: createValue(position.x),
-      y: createValue(position.y),
-      opacity: createValue(0),
-      scale: createValue(1),
-      borderRadius: createValue(6),
-    }),
-    []
-  );
+  // indicate animation is done
+  const hasOpened = useRef(false);
 
-  // const width = createValue(position.width);
-  // const height = createValue(position.height);
-  // const x = createValue(position.x);
-  // const y = createValue(position.y);
-  // const opacity = createValue(0);
-  // const scale = createValue(1);
-  // const borderRadius = createValue(6);
+  // run when animation is done
+  const setOpened = () => {
+    hasOpened.current = true;
+  };
+
+  const applyValue = (v) => {
+    // only set value when animation is done
+    if (!hasOpened.current) {
+      return false;
+    }
+
+    setValue(v);
+  };
+
+  const width = createValue(position.width);
+  const height = createValue(position.height);
+  const x = createValue(position.x);
+  const y = createValue(position.y);
+  const opacity = createValue(0);
+  const scale = createValue(1);
+  const borderRadius = createValue(6);
   const p = {
     position: "absolute",
     width: width.value,
@@ -93,6 +97,7 @@ const Modal = ({
             timing(y, position.y, sliderY),
             timing(borderRadius, 6, 15),
             timing(opacity, 0, 1),
+            cond(eq(clockRunning(width.clock), 0), call([], setOpened)),
           ]
         ),
       ]),
@@ -109,7 +114,7 @@ const Modal = ({
       close,
     ]
   );
-  console.log(value);
+  // console.log(value);
   return (
     <>
       <TouchableWithoutFeedback onPress={prepareForClose}>
@@ -138,7 +143,8 @@ const Modal = ({
             height={300}
             width={100}
             borderRadius={15}
-            onChange={setValue}
+            initialValue={value}
+            onChange={applyValue}
           />
         </Animated.View>
       </Animated.View>

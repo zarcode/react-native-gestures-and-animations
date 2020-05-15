@@ -38,8 +38,7 @@ const Amplify = ({
   initialValue,
   onChange,
 }: AmplifyProps) => {
-  const hasMounted = useRef(false);
-  const initialTranslationY = INITHEIGHT - (initialValue * INITHEIGHT) / 100;
+  const initialTranslationY = ((100 - initialValue) * itemsHeight) / 100;
 
   const { state, translationY, velocityX, velocityY, offsetY } = useMemoOne(
     () => ({
@@ -53,14 +52,8 @@ const Amplify = ({
   );
 
   useEffect(() => {
-    setTimeout(() => {
-      hasMounted.current = true;
-    }, 1000);
-  }, []);
-
-  // useEffect(() => {
-  //   translationY.setValue(initialTranslationY);
-  // }, [initialTranslationY]);
+    translationY.setValue(initialTranslationY);
+  }, [translationY, initialTranslationY]);
 
   const gestureHandler = onGestureEvent({
     state,
@@ -72,15 +65,10 @@ const Amplify = ({
   let handler: ReturnType<typeof setTimeout>;
 
   const onSnap = ([x]: readonly number[]) => {
-    console.log("loaded", hasMounted.current);
-    if (!hasMounted.current) {
-      return false;
-    }
-
     clearTimeout(handler);
 
     handler = setTimeout(() => {
-      onChange((100 * (INITHEIGHT - x)) / INITHEIGHT);
+      onChange((100 * (itemsHeight - x)) / itemsHeight);
     }, 400);
   };
 

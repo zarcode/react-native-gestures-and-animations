@@ -54,21 +54,21 @@ const IOSAmply = () => {
     }
   }, [shouldClose, position]);
 
-  useEffect(() => {
-    console.log("shouldClose");
-  }, [shouldClose]);
+  // useEffect(() => {
+  //   console.log("shouldClose");
+  // }, [shouldClose]);
 
-  useEffect(() => {
-    console.log("position", position);
-  }, [position]);
+  // useEffect(() => {
+  //   console.log("position", position);
+  // }, [position]);
 
-  useEffect(() => {
-    console.log("value", value);
-  }, [value]);
+  // useEffect(() => {
+  //   console.log("value", value);
+  // }, [value]);
 
-  useEffect(() => {
-    console.log("prepareForClose", prepareForClose);
-  }, [prepareForClose]);
+  // useEffect(() => {
+  //   console.log("prepareForClose", prepareForClose);
+  // }, [prepareForClose]);
 
   return (
     <View style={styles.container}>
