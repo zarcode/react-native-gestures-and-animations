@@ -73,7 +73,7 @@ const IOSAmply = () => {
   return (
     <View style={styles.container}>
       <View style={{ marginTop: 100, marginLeft: 10 }}>
-        <Control open={open} setValue={setValue} />
+        <Control open={open} />
       </View>
       {position !== null && (
         <Modal
@@ -81,8 +81,6 @@ const IOSAmply = () => {
           position={position}
           prepareForClose={prepareForClose}
           shouldClose={shouldClose}
-          value={value}
-          setValue={setValue}
         />
       )}
     </View>

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   StyleSheet,
   TouchableWithoutFeedback,
@@ -41,25 +41,25 @@ const Modal = ({
   position,
   shouldClose,
   prepareForClose,
-  value,
-  setValue,
 }: ModalProps) => {
-  // indicate animation is done
-  const hasOpened = useRef(false);
+  const [amplifyValue, setAmplifyValue] = useState(0);
 
-  // run when animation is done
-  const setOpened = () => {
-    hasOpened.current = true;
-  };
+  // // indicate animation is done
+  // const hasOpened = useRef(false);
 
-  const applyValue = (v) => {
-    // only set value when animation is done
-    if (!hasOpened.current) {
-      return false;
-    }
+  // // run when animation is done
+  // const setOpened = () => {
+  //   hasOpened.current = true;
+  // };
 
-    setValue(v);
-  };
+  // const applyValue = (v) => {
+  //   // only set value when animation is done
+  //   if (!hasOpened.current) {
+  //     return false;
+  //   }
+
+  //   setAmplifyValue(v);
+  // };
 
   const width = createValue(position.width);
   const height = createValue(position.height);
@@ -97,7 +97,7 @@ const Modal = ({
             timing(y, position.y, sliderY),
             timing(borderRadius, 6, 15),
             timing(opacity, 0, 1),
-            cond(eq(clockRunning(width.clock), 0), call([], setOpened)),
+            // cond(eq(clockRunning(width.clock), 0), call([], setOpened)),
           ]
         ),
       ]),
@@ -143,8 +143,8 @@ const Modal = ({
             height={300}
             width={100}
             borderRadius={15}
-            initialValue={value}
-            onChange={applyValue}
+            initialValue={0}
+            onChange={setAmplifyValue}
           />
         </Animated.View>
       </Animated.View>
@@ -152,4 +152,4 @@ const Modal = ({
   );
 };
 
-export default React.memo(Modal, () => true);
+export default React.memo(Modal);

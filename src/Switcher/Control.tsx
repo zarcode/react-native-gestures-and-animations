@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Text } from "react-native";
 import Animated from "react-native-reanimated";
 import { LongPressGestureHandler } from "react-native-gesture-handler";
@@ -30,7 +30,10 @@ interface ControlProps {
   open: (position: Position) => void;
 }
 
-const Control = ({ open, setValue }: ControlProps) => {
+const Control = ({ open }: ControlProps) => {
+  const [amplifyValue, setAmplifyValue] = useState(0);
+
+  // for measure
   const item = useRef(null);
 
   const startTransition = async () => {
@@ -54,7 +57,8 @@ const Control = ({ open, setValue }: ControlProps) => {
             height={100}
             width={30}
             borderRadius={6}
-            onChange={setValue}
+            initialValue={0}
+            onChange={setAmplifyValue}
           />
         </Animated.View>
         {/* <LongPressGestureHandler onGestureEvent={startTransition}>
