@@ -5,7 +5,18 @@ import Animated from "react-native-reanimated";
 import { useMemoOne } from "use-memo-one";
 import { onGestureEvent } from "react-native-redash";
 
-const { Value, diffClamp, cond, set, eq, add, sub } = Animated;
+const {
+  Value,
+  diffClamp,
+  cond,
+  set,
+  eq,
+  add,
+  sub,
+  debug,
+  defined,
+  not,
+} = Animated;
 const { block, useCode, call } = Animated;
 
 const INITHEIGHT = 300;
@@ -14,14 +25,51 @@ const INIT_BORDER_RADIUS = 15;
 
 const withOffset = (
   value: Animated.Node<number>,
-  state: Animated.Value<State>,
+  gestureState: Animated.Value<State>,
   offset: Animated.Value<number> = new Value(0)
-) =>
-  cond(
-    eq(state, State.END),
-    [set(offset, add(offset, value)), offset],
-    [add(offset, value)]
-  );
+) => {
+  const safeOffset: Animated.Value<number> = new Value(0);
+  return block([
+    cond(
+      eq(safeOffset, 0), // ako nije definisan
+      [
+        // debug("postavi", offset),
+        set(safeOffset, offset === undefined ? 0 : offset),
+      ] // postavi na 0 ili ofset iz args
+    ),
+    // cond(
+    //   eq(gestureState, State.END),
+    //   [set(offset, add(offset, value)), offset],
+    //   [add(offset, value)]
+    // );
+
+    cond(
+      eq(gestureState, State.ACTIVE),
+      [
+        // debug("active", add(safeOffset, value)),
+        add(safeOffset, value),
+      ],
+      [
+        // debug("sacuvaj state", gestureState),
+        // debug("sacuvaj value", value),
+        // debug("sacuvaj of", add(safeOffset, value)),
+        // ako je aktivna animacija stavi vrednost da bude ofset
+        set(safeOffset, add(safeOffset, value)), // kad se zavrsi na safe ofset dodaj value
+      ]
+    ),
+  ]);
+};
+
+// const withOffset = (
+//   value: Animated.Node<number>,
+//   state: Animated.Value<State>,
+//   offset: Animated.Value<number> = new Value(0)
+// ) =>
+//   cond(
+//     eq(state, State.END),
+//     [set(offset, add(offset, value)), offset],
+//     [add(offset, value)]
+//   );
 
 interface AmplifyProps {
   height: number;
@@ -37,29 +85,25 @@ const Amplify = ({
   borderRadius: itemBorderRadius,
   initialValue,
   onChange,
+  modal,
 }: AmplifyProps) => {
   const initialTranslationY = ((100 - initialValue) * itemsHeight) / 100;
 
-  const { state, translationY, velocityX, velocityY, offsetY } = useMemoOne(
-    () => ({
-      state: new Value(State.UNDETERMINED),
-      translationY: new Value(0),
-      velocityX: new Value(0),
-      velocityY: new Value(0),
-      offsetY: new Value(0),
-    }),
-    []
-  );
+  // debugger;
+  const state = new Value(State.UNDETERMINED);
+  const translationY = new Value(0);
 
-  useEffect(() => {
-    translationY.setValue(initialTranslationY);
-  }, [translationY, initialTranslationY]);
+  // const { state, translationY, offsetY } = useMemoOne(() => {
+  //   return {
+  //     state: new Value(State.UNDETERMINED),
+  //     translationY: new Value(0),
+  //     offsetY: new Value(0),
+  //   };
+  // }, []);
 
   const gestureHandler = onGestureEvent({
     state,
     translationY,
-    velocityX,
-    velocityY,
   });
 
   let handler: ReturnType<typeof setTimeout>;
@@ -74,13 +118,22 @@ const Amplify = ({
 
   // v = 300x/100
 
-  const translateY = diffClamp(
-    withOffset(translationY, state, offsetY),
-    0,
-    itemsHeight
-  );
+  const tY = withOffset(translationY, state, new Value(initialTranslationY));
 
-  useCode(() => block([call([translateY], onSnap)]), [translateY]);
+  const translateY = diffClamp(tY, 0, itemsHeight);
+
+  // const test = new Value();
+  // const test = new Value(undefined);
+  useCode(
+    () =>
+      block([
+        debug("tY", tY),
+        debug("translateY", translateY),
+        // debug("offsetY", offsetY),
+        call([translateY], onSnap),
+      ]),
+    [translateY]
+  );
 
   return (
     <PanGestureHandler {...gestureHandler}>
@@ -115,4 +168,6 @@ Amplify.defaultProps = {
   initialValue: 0,
 };
 
-export default React.memo(Amplify);
+export default React.memo(Amplify, (prevProps, nextProps) => {
+  return prevProps.initialValue === nextProps.initialValue;
+});

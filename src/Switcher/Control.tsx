@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Text } from "react-native";
 import Animated from "react-native-reanimated";
 import { LongPressGestureHandler } from "react-native-gesture-handler";
@@ -30,8 +30,12 @@ interface ControlProps {
   open: (position: Position) => void;
 }
 
-const Control = ({ open }: ControlProps) => {
+const Control = ({ open, value }: ControlProps) => {
   const [amplifyValue, setAmplifyValue] = useState(0);
+
+  useEffect(() => {
+    console.log("value1", value);
+  }, [value]);
 
   // for measure
   const item = useRef(null);
@@ -39,31 +43,29 @@ const Control = ({ open }: ControlProps) => {
   const startTransition = async () => {
     // if (position === null) {
     const p = await measure(item.current.getNode());
-    open(p);
+    open(p, amplifyValue);
     // }
   };
 
   return (
     <>
+      <Animated.View
+        ref={item}
+        style={[
+          { width: 30 },
+          // { opacity: cond(eq(activeAppId, app.id), 0, 1) }
+        ]}
+      >
+        <Amplify
+          height={100}
+          width={50}
+          borderRadius={6}
+          initialValue={value}
+          onChange={setAmplifyValue}
+        />
+      </Animated.View>
       <TouchableWithoutFeedback onLongPress={startTransition}>
-        <Animated.View
-          ref={item}
-          style={[
-            { width: 30 },
-            // { opacity: cond(eq(activeAppId, app.id), 0, 1) }
-          ]}
-        >
-          <Amplify
-            height={100}
-            width={30}
-            borderRadius={6}
-            initialValue={0}
-            onChange={setAmplifyValue}
-          />
-        </Animated.View>
-        {/* <LongPressGestureHandler onGestureEvent={startTransition}>
-          <Text>LongPressGestureHandler</Text>
-        </LongPressGestureHandler> */}
+        <Text>LongPressGestureHandler</Text>
       </TouchableWithoutFeedback>
     </>
   );

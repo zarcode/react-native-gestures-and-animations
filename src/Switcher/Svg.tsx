@@ -7,6 +7,8 @@ import Control from "./Control";
 import Modal from "./Modal";
 import { Position } from "./Model";
 
+const { Value, block, useCode, debug, defined } = Animated;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -26,7 +28,8 @@ const IOSAmply = () => {
     []
   );
 
-  const open = (p: Position) => {
+  const open = (p: Position, v) => {
+    setValue(v);
     setPosition(p);
   };
 
@@ -35,7 +38,9 @@ const IOSAmply = () => {
   // };
 
   const close = useCallback(() => {
+    // setTimeout(() => {
     setPosition(null);
+    // }, 1000);
   }, []);
 
   // prepare for closing
@@ -43,7 +48,8 @@ const IOSAmply = () => {
   //   shouldClose.setValue(1);
   // };
 
-  const prepareForClose = useCallback(() => {
+  const prepareForClose = useCallback((v) => {
+    setValue(v);
     shouldClose.setValue(1);
   }, []);
 
@@ -62,9 +68,9 @@ const IOSAmply = () => {
   //   console.log("position", position);
   // }, [position]);
 
-  // useEffect(() => {
-  //   console.log("value", value);
-  // }, [value]);
+  useEffect(() => {
+    console.log("value", value);
+  }, [value]);
 
   // useEffect(() => {
   //   console.log("prepareForClose", prepareForClose);
@@ -73,7 +79,7 @@ const IOSAmply = () => {
   return (
     <View style={styles.container}>
       <View style={{ marginTop: 100, marginLeft: 10 }}>
-        <Control open={open} />
+        <Control open={open} value={value} />
       </View>
       {position !== null && (
         <Modal
@@ -81,6 +87,7 @@ const IOSAmply = () => {
           position={position}
           prepareForClose={prepareForClose}
           shouldClose={shouldClose}
+          value={value}
         />
       )}
     </View>

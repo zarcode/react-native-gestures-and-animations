@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   StyleSheet,
   TouchableWithoutFeedback,
@@ -41,8 +41,16 @@ const Modal = ({
   position,
   shouldClose,
   prepareForClose,
+  value,
 }: ModalProps) => {
   const [amplifyValue, setAmplifyValue] = useState(0);
+
+  // yellow warning
+  // useEffect(() => {
+  //   return () => {
+  //     setAmplifyValue(0);
+  //   };
+  // }, []);
 
   // // indicate animation is done
   // const hasOpened = useRef(false);
@@ -61,13 +69,27 @@ const Modal = ({
   //   setAmplifyValue(v);
   // };
 
-  const width = createValue(position.width);
-  const height = createValue(position.height);
-  const x = createValue(position.x);
-  const y = createValue(position.y);
-  const opacity = createValue(0);
-  const scale = createValue(1);
-  const borderRadius = createValue(6);
+  // const width = createValue(position.width);
+  // const height = createValue(position.height);
+  // const x = createValue(position.x);
+  // const y = createValue(position.y);
+  // const opacity = createValue(0);
+  // const scale = createValue(1);
+  // const borderRadius = createValue(6);
+
+  const { width, height, x, y, opacity, scale, borderRadius } = useMemoOne(
+    () => ({
+      width: createValue(position.width),
+      height: createValue(position.height),
+      x: createValue(position.x),
+      y: createValue(position.y),
+      opacity: createValue(0),
+      scale: createValue(1),
+      borderRadius: createValue(6),
+    }),
+    []
+  );
+
   const p = {
     position: "absolute",
     width: width.value,
@@ -116,8 +138,8 @@ const Modal = ({
   );
   // console.log(value);
   return (
-    <>
-      <TouchableWithoutFeedback onPress={prepareForClose}>
+    <View style={{ flex: 1 }}>
+      <TouchableWithoutFeedback onPress={() => prepareForClose(amplifyValue)}>
         <Animated.View
           style={[StyleSheet.absoluteFill, { backgroundColor: "yellow" }]}
         />
@@ -140,15 +162,16 @@ const Modal = ({
           ]}
         >
           <Amplify
-            height={300}
-            width={100}
-            borderRadius={15}
-            initialValue={0}
+            height={100}
+            width={50}
+            borderRadius={6}
+            initialValue={value}
             onChange={setAmplifyValue}
+            modal={true}
           />
         </Animated.View>
       </Animated.View>
-    </>
+    </View>
   );
 };
 
