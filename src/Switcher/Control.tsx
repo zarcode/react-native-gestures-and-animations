@@ -48,7 +48,7 @@ const Control = ({ open, value }: ControlProps) => {
   };
 
   return (
-    <>
+    <TouchableWithoutFeedback onLongPress={startTransition}>
       <Animated.View
         ref={item}
         style={[
@@ -64,10 +64,7 @@ const Control = ({ open, value }: ControlProps) => {
           onChange={setAmplifyValue}
         />
       </Animated.View>
-      <TouchableWithoutFeedback onLongPress={startTransition}>
-        <Text>LongPressGestureHandler</Text>
-      </TouchableWithoutFeedback>
-    </>
+    </TouchableWithoutFeedback>
   );
 };
 

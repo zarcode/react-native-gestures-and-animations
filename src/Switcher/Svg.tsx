@@ -38,9 +38,7 @@ const IOSAmply = () => {
   // };
 
   const close = useCallback(() => {
-    // setTimeout(() => {
     setPosition(null);
-    // }, 1000);
   }, []);
 
   // prepare for closing
