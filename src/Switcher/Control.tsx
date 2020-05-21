@@ -33,18 +33,12 @@ interface ControlProps {
 const Control = ({ open, value }: ControlProps) => {
   const [amplifyValue, setAmplifyValue] = useState(0);
 
-  useEffect(() => {
-    console.log("value1", value);
-  }, [value]);
-
   // for measure
   const item = useRef(null);
 
   const startTransition = async () => {
-    // if (position === null) {
     const p = await measure(item.current.getNode());
     open(p, amplifyValue);
-    // }
   };
 
   return (

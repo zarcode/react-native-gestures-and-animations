@@ -28,12 +28,14 @@ const withOffset = (
   gestureState: Animated.Value<State>,
   offset: Animated.Value<number> = new Value(0)
 ) => {
-  const safeOffset: Animated.Value<number> = new Value(0);
+  const safeOffset: Animated.Value<number> = new Value(-1);
+
   return block([
+    debug("safeOffset", safeOffset),
     cond(
-      eq(safeOffset, 0), // ako nije definisan
+      eq(safeOffset, -1), // ako nije definisan
       [
-        // debug("postavi", offset),
+        debug("postavi", offset),
         set(safeOffset, offset === undefined ? 0 : offset),
       ] // postavi na 0 ili ofset iz args
     ),
@@ -45,14 +47,11 @@ const withOffset = (
 
     cond(
       eq(gestureState, State.ACTIVE),
-      [
-        // debug("active", add(safeOffset, value)),
-        add(safeOffset, value),
-      ],
+      [debug("active", value), add(safeOffset, value)],
       [
         // debug("sacuvaj state", gestureState),
         // debug("sacuvaj value", value),
-        // debug("sacuvaj of", add(safeOffset, value)),
+        debug("sacuvaj of", value),
         // ako je aktivna animacija stavi vrednost da bude ofset
         set(safeOffset, add(safeOffset, value)), // kad se zavrsi na safe ofset dodaj value
       ]
@@ -89,17 +88,16 @@ const Amplify = ({
 }: AmplifyProps) => {
   const initialTranslationY = ((100 - initialValue) * itemsHeight) / 100;
 
-  // debugger;
-  const state = new Value(State.UNDETERMINED);
+  // const state = new Value(State.UNDETERMINED);
   const translationY = new Value(0);
 
-  // const { state, translationY, offsetY } = useMemoOne(() => {
-  //   return {
-  //     state: new Value(State.UNDETERMINED),
-  //     translationY: new Value(0),
-  //     offsetY: new Value(0),
-  //   };
-  // }, []);
+  const { state } = useMemoOne(() => {
+    return {
+      state: new Value(State.UNDETERMINED),
+      translationY: new Value(0),
+      offsetY: new Value(initialTranslationY),
+    };
+  }, []);
 
   const gestureHandler = onGestureEvent({
     state,
@@ -111,8 +109,14 @@ const Amplify = ({
   const onSnap = ([x]: readonly number[]) => {
     clearTimeout(handler);
 
+    const newValue = (100 * (itemsHeight - x)) / itemsHeight;
+
+    // console.log("newValue", newValue);
+    // console.log("initialValue", initialValue);
     handler = setTimeout(() => {
-      onChange((100 * (itemsHeight - x)) / itemsHeight);
+      if (newValue !== initialValue) {
+        onChange(newValue);
+      }
     }, 400);
   };
 
@@ -129,7 +133,7 @@ const Amplify = ({
   useCode(
     () =>
       block([
-        debug("tY", tY),
+        // debug("tY", tY),
         // debug("translateY", translateY),
         // debug("offsetY", offsetY),
         call([translateY], onSnap),
@@ -138,7 +142,7 @@ const Amplify = ({
   );
 
   return (
-    <PanGestureHandler {...gestureHandler}>
+    <PanGestureHandler {...gestureHandler} key={initialValue}>
       <Animated.View
         style={{
           width: itemWidth,
