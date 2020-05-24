@@ -29,6 +29,7 @@ const IOSAmply = () => {
   );
 
   const open = (p: Position, v) => {
+    console.log("open", v);
     setValue(v);
     setPosition(p);
   };

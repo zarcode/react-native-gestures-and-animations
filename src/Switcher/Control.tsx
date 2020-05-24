@@ -31,7 +31,7 @@ interface ControlProps {
 }
 
 const Control = ({ open, value }: ControlProps) => {
-  const [amplifyValue, setAmplifyValue] = useState(0);
+  const [amplifyValue, setAmplifyValue] = useState(value);
 
   // for measure
   const item = useRef(null);

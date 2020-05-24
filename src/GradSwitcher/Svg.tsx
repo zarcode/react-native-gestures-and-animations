@@ -9,7 +9,17 @@ import { onGestureEvent } from "react-native-redash";
 import { Card, StyleGuide, cards } from "../components";
 import { CARD_HEIGHT, CARD_WIDTH } from "../components/Card";
 
-const { Value, diffClamp, cond, set, eq, add, sub, interpolate } = Animated;
+const {
+  Value,
+  diffClamp,
+  cond,
+  set,
+  eq,
+  add,
+  sub,
+  interpolate,
+  debug,
+} = Animated;
 const { block, useCode, call } = Animated;
 const { width, height } = Dimensions.get("window");
 const containerWidth = width;
@@ -77,7 +87,11 @@ export default () => {
     INITHEIGHT
   );
 
-  useCode(() => block([call([translateY], onSnap)]), [translateY]);
+  useCode(
+    () =>
+      block([debug("translationY", translationY), call([translateY], onSnap)]),
+    [translateY]
+  );
 
   const progress = sub(INITHEIGHT, translateY);
 

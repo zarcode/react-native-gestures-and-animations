@@ -43,7 +43,7 @@ const Modal = ({
   prepareForClose,
   value,
 }: ModalProps) => {
-  const [amplifyValue, setAmplifyValue] = useState(0);
+  const [amplifyValue, setAmplifyValue] = useState(value);
 
   // yellow warning
   // useEffect(() => {
@@ -136,7 +136,9 @@ const Modal = ({
       close,
     ]
   );
-  // console.log(value);
+
+  debugger;
+
   return (
     <View style={{ flex: 1 }}>
       <TouchableWithoutFeedback onPress={() => prepareForClose(amplifyValue)}>

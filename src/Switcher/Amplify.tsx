@@ -6,7 +6,7 @@ import { useMemoOne } from "use-memo-one";
 import { onGestureEvent } from "react-native-redash";
 import diffClamp from "./diffClamp";
 
-const { Value, cond, set, eq, add, sub } = Animated;
+const { Value, cond, set, eq, add, sub, debug } = Animated;
 const { block, useCode, call } = Animated;
 
 const INITHEIGHT = 300;
@@ -81,13 +81,22 @@ const Amplify = ({
     }, 400);
   };
 
-  const translateY = diffClamp(
-    withOffset(translationY, state, new Value(initialTranslationY)),
-    0,
-    INITHEIGHT
+  const ty = withOffset(translationY, state, new Value(initialTranslationY));
+
+  const translateY = diffClamp(ty, 0, INITHEIGHT);
+
+  debugger;
+  useCode(
+    () =>
+      block([
+        debug("ty", ty),
+        debug("translateY", translateY),
+        call([translateY], onSnap),
+      ]),
+    [translateY]
   );
 
-  useCode(() => block([call([translateY], onSnap)]), [translateY]);
+  console.log({ initialValue });
 
   return (
     <PanGestureHandler {...gestureHandler} key={initialValue}>
