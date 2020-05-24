@@ -1,12 +1,27 @@
 import Animated from "react-native-reanimated";
 
-const { cond, diff, set, add, proc, eq, min, max, Value, not } = Animated;
+const {
+  cond,
+  diff,
+  set,
+  add,
+  proc,
+  eq,
+  min,
+  max,
+  Value,
+  not,
+  block,
+  debug,
+} = Animated;
 
 const procAcc = proc(function(a, minVal, maxVal, value) {
-  return set(
-    value,
-    min(max(add(cond(not(eq(value, -1)), value, a), diff(a)), minVal), maxVal)
-  );
+  return block([
+    set(
+      value,
+      min(max(add(cond(not(eq(value, -1)), value, a), diff(a)), minVal), maxVal)
+    ),
+  ]);
 });
 
 export default function diffClamp(a, minVal, maxVal) {

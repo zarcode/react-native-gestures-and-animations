@@ -137,8 +137,6 @@ const Modal = ({
     ]
   );
 
-  debugger;
-
   return (
     <View style={{ flex: 1 }}>
       <TouchableWithoutFeedback onPress={() => prepareForClose(amplifyValue)}>

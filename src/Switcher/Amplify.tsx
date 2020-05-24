@@ -83,14 +83,13 @@ const Amplify = ({
 
   const ty = withOffset(translationY, state, new Value(initialTranslationY));
 
-  const translateY = diffClamp(ty, 0, INITHEIGHT);
+  const translateY = diffClamp(ty, 0, itemsHeight);
 
-  debugger;
   useCode(
     () =>
       block([
-        debug("ty", ty),
-        debug("translateY", translateY),
+        // debug("ty", ty),
+        // debug("translateY", translateY),
         call([translateY], onSnap),
       ]),
     [translateY]
