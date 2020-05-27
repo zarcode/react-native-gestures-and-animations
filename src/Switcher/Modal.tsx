@@ -1,39 +1,30 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
+  Dimensions,
   StyleSheet,
   TouchableWithoutFeedback,
   View,
-  Dimensions,
 } from "react-native";
 import Animated from "react-native-reanimated";
 import { useMemoOne } from "use-memo-one";
 import Amplify from "./Amplify";
 import { Position } from "./Model";
 import { createValue, timing, timingBack } from "./Timing";
+
 const { width: wWidth, height: wHeight } = Dimensions.get("window");
 const sliderWidth = 100;
 const sliderHeight = 300;
 const sliderX = (wWidth - sliderWidth) / 2;
 const sliderY = (wHeight - sliderHeight) / 2;
 
-const {
-  Value,
-  diffClamp,
-  cond,
-  set,
-  eq,
-  add,
-  sub,
-  useCode,
-  clockRunning,
-  block,
-  call,
-  debug,
-} = Animated;
+const { cond, eq, useCode, clockRunning, block, call } = Animated;
 
 interface ModalProps {
   position: Position;
   close: () => void;
+  prepareForClose: (value: number) => void;
+  shouldClose: Animated.Value<0 | 1>;
+  value: number;
 }
 
 const Modal = ({
@@ -45,49 +36,17 @@ const Modal = ({
 }: ModalProps) => {
   const [amplifyValue, setAmplifyValue] = useState(value);
 
-  // yellow warning
-  // useEffect(() => {
-  //   return () => {
-  //     setAmplifyValue(0);
-  //   };
-  // }, []);
-
-  // // indicate animation is done
-  // const hasOpened = useRef(false);
-
-  // // run when animation is done
-  // const setOpened = () => {
-  //   hasOpened.current = true;
-  // };
-
-  // const applyValue = (v) => {
-  //   // only set value when animation is done
-  //   if (!hasOpened.current) {
-  //     return false;
-  //   }
-
-  //   setAmplifyValue(v);
-  // };
-
-  // const width = createValue(position.width);
-  // const height = createValue(position.height);
-  // const x = createValue(position.x);
-  // const y = createValue(position.y);
-  // const opacity = createValue(0);
-  // const scale = createValue(1);
-  // const borderRadius = createValue(6);
-
-  const { width, height, x, y, opacity, scale, borderRadius } = useMemoOne(
+  const { width, height, x, y, opacity, borderRadius } = useMemoOne(
     () => ({
       width: createValue(position.width),
       height: createValue(position.height),
       x: createValue(position.x),
       y: createValue(position.y),
       opacity: createValue(0),
-      scale: createValue(1),
+      // scale: createValue(1),
       borderRadius: createValue(6),
     }),
-    []
+    [position.width, position.height, position.x, position.y]
   );
 
   const p = {
@@ -123,18 +82,7 @@ const Modal = ({
           ]
         ),
       ]),
-    [
-      width,
-      height,
-      position,
-      borderRadius,
-      shouldClose,
-      opacity,
-      x,
-      y,
-      scale,
-      close,
-    ]
+    [width, height, position, borderRadius, shouldClose, opacity, x, y, close]
   );
 
   return (
@@ -167,7 +115,6 @@ const Modal = ({
             borderRadius={6}
             initialValue={value}
             onChange={setAmplifyValue}
-            modal={true}
           />
         </Animated.View>
       </Animated.View>

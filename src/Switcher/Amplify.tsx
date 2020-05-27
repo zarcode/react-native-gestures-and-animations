@@ -46,17 +46,12 @@ const Amplify = ({
   onChange,
 }: AmplifyProps) => {
   const initialTranslationY = ((100 - initialValue) * itemsHeight) / 100;
-  // console.log({ initialValue });
-  // console.log({ initialTranslationY });
-  // debugger;
 
   const translationY = new Value(0);
 
   const { state } = useMemoOne(() => {
     return {
       state: new Value(State.UNDETERMINED),
-      translationY: new Value(0),
-      offsetY: new Value(initialTranslationY),
     };
   }, []);
 
@@ -121,6 +116,4 @@ Amplify.defaultProps = {
   initialValue: 0,
 };
 
-export default React.memo(Amplify, (prevProps, nextProps) => {
-  return prevProps.initialValue === nextProps.initialValue;
-});
+export default React.memo(Amplify);
