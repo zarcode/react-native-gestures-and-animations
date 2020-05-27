@@ -1,13 +1,10 @@
-import React, { useEffect, useRef } from "react";
-import { StyleSheet } from "react-native";
+import React, { useRef } from "react";
 import { PanGestureHandler, State } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { useMemoOne } from "use-memo-one";
-import { onGestureEvent } from "react-native-redash";
-import diffClamp from "./diffClamp";
+import { diffClamp, onGestureEvent } from "react-native-redash";
 
-const { Value, cond, set, eq, add, sub, debug } = Animated;
-const { block, useCode, call } = Animated;
+const { Value, cond, set, eq, add, sub, block, useCode, call } = Animated;
 
 const INITHEIGHT = 300;
 const INITWIDTH = 100;
@@ -21,10 +18,9 @@ const withOffset = (
   const safeOffset: Animated.Value<number> = new Value(-1);
 
   return block([
-    cond(
-      eq(safeOffset, -1), // ako nije definisan
-      [set(safeOffset, offset === undefined ? 0 : offset)] // postavi na 0 ili ofset iz args
-    ),
+    cond(eq(safeOffset, -1), [
+      set(safeOffset, offset === undefined ? 0 : offset),
+    ]),
 
     cond(
       eq(gestureState, State.ACTIVE),
@@ -48,9 +44,11 @@ const Amplify = ({
   borderRadius: itemBorderRadius,
   initialValue,
   onChange,
-  modal,
 }: AmplifyProps) => {
   const initialTranslationY = ((100 - initialValue) * itemsHeight) / 100;
+  // console.log({ initialValue });
+  // console.log({ initialTranslationY });
+  // debugger;
 
   const translationY = new Value(0);
 
@@ -67,35 +65,28 @@ const Amplify = ({
     translationY,
   });
 
-  let handler: ReturnType<typeof setTimeout>;
+  const handler = useRef<ReturnType<typeof setTimeout>>();
 
-  const onSnap = ([x]: readonly number[]) => {
-    clearTimeout(handler);
-
-    const newValue = (100 * (itemsHeight - x)) / itemsHeight;
-
-    handler = setTimeout(() => {
-      if (newValue !== initialValue) {
-        onChange(newValue);
-      }
-    }, 400);
-  };
-
-  const ty = withOffset(translationY, state, new Value(initialTranslationY));
-
-  const translateY = diffClamp(ty, 0, itemsHeight);
-
-  useCode(
-    () =>
-      block([
-        // debug("ty", ty),
-        // debug("translateY", translateY),
-        call([translateY], onSnap),
-      ]),
-    [translateY]
+  const translateY = diffClamp(
+    withOffset(translationY, state, new Value(initialTranslationY)),
+    0,
+    itemsHeight
   );
 
-  console.log({ initialValue });
+  useCode(() => {
+    const onSnap = ([x]: readonly number[]) => {
+      clearTimeout(handler.current);
+
+      const newValue = (100 * (itemsHeight - x)) / itemsHeight;
+
+      handler.current = setTimeout(() => {
+        if (newValue !== initialValue) {
+          onChange(newValue);
+        }
+      }, 400);
+    };
+    return block([call([translateY], onSnap)]);
+  }, [translateY, onChange, initialValue, itemsHeight]);
 
   return (
     <PanGestureHandler {...gestureHandler} key={initialValue}>

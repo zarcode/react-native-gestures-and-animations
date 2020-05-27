@@ -55,8 +55,8 @@ const Control = ({ open, value }: ControlProps) => {
       >
         <Amplify
           height={100}
-          width={50}
-          borderRadius={6}
+          width={33}
+          borderRadius={8}
           initialValue={value}
           onChange={setAmplifyValue}
         />

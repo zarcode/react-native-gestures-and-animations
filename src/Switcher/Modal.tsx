@@ -162,8 +162,8 @@ const Modal = ({
           ]}
         >
           <Amplify
-            height={100}
-            width={50}
+            height={300}
+            width={100}
             borderRadius={6}
             initialValue={value}
             onChange={setAmplifyValue}
