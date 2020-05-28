@@ -40,11 +40,11 @@ const Control = ({ open, value }: ControlProps) => {
 
   return (
     <TouchableWithoutFeedback onLongPress={startTransition}>
-      <Animated.View ref={item} style={[{ width: 30 }]}>
+      <Animated.View ref={item} style={[{ width: 40 }]}>
         <Amplify
-          height={100}
-          width={33}
-          borderRadius={8}
+          height={120}
+          width={40}
+          borderRadius={6}
           initialValue={value}
           onChange={setAmplifyValue}
         />

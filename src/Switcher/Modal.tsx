@@ -86,7 +86,7 @@ const Modal = ({
   );
 
   return (
-    <View style={{ flex: 1 }}>
+    <>
       <TouchableWithoutFeedback onPress={() => prepareForClose(amplifyValue)}>
         <Animated.View
           style={[StyleSheet.absoluteFill, { backgroundColor: "yellow" }]}
@@ -96,14 +96,29 @@ const Modal = ({
         style={[
           p,
           {
-            backgroundColor: "blue",
-            // borderRadius: borderRadius.value
+            borderRadius: borderRadius.value,
+            overflow: "hidden",
           },
         ]}
       >
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: "black" }]}>
+          <View
+            style={[
+              {
+                position: "absolute",
+                left: 0,
+                bottom: 0,
+                right: 0,
+                height: (value * 120) / 100,
+                backgroundColor: "red",
+              },
+            ]}
+          />
+        </View>
         <Animated.View
           style={[
             {
+              zIndex: 1,
               opacity: opacity.value,
               // borderRadius: borderRadius.value
             },
@@ -112,13 +127,13 @@ const Modal = ({
           <Amplify
             height={300}
             width={100}
-            borderRadius={6}
+            borderRadius={15}
             initialValue={value}
             onChange={setAmplifyValue}
           />
         </Animated.View>
       </Animated.View>
-    </View>
+    </>
   );
 };
 

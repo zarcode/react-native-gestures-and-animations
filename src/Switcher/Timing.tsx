@@ -43,7 +43,7 @@ export const timing = (
         clock: v.clock,
         from,
         to,
-        duration: 100,
+        duration: 200,
         easing,
       })
     ),
