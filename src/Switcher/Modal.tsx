@@ -8,7 +8,7 @@ import {
 import Animated from "react-native-reanimated";
 import { useMemoOne } from "use-memo-one";
 import Amplify from "./Amplify";
-import { Position } from "./Model";
+import { Position, largeDim, smallDim } from "./Model";
 import { createValue, timing, timingBack } from "./Timing";
 
 const { width: wWidth, height: wHeight } = Dimensions.get("window");
@@ -109,7 +109,7 @@ const Modal = ({
                 left: 0,
                 bottom: 0,
                 right: 0,
-                height: (value * 120) / 100,
+                height: (value * smallDim.height) / 100,
                 backgroundColor: "red",
               },
             ]}
@@ -125,9 +125,9 @@ const Modal = ({
           ]}
         >
           <Amplify
-            height={300}
-            width={100}
-            borderRadius={15}
+            height={largeDim.height}
+            width={largeDim.width}
+            borderRadius={largeDim.borderRadius}
             initialValue={value}
             onChange={setAmplifyValue}
           />

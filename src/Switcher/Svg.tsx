@@ -11,8 +11,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: StyleGuide.palette.background,
-    // alignItems: "center",
-    // justifyContent: "center",
   },
 });
 const IOSAmply = () => {

@@ -3,7 +3,7 @@ import Animated from "react-native-reanimated";
 import { Constants } from "expo";
 import { Platform, TouchableWithoutFeedback, View } from "react-native";
 import Amplify from "./Amplify";
-import { Position } from "./Model";
+import { Position, smallDim } from "./Model";
 
 const offset = (v: number) =>
   (Platform.OS === "android" ? v + Constants.statusBarHeight : v) - 88;
@@ -40,11 +40,11 @@ const Control = ({ open, value }: ControlProps) => {
 
   return (
     <TouchableWithoutFeedback onLongPress={startTransition}>
-      <Animated.View ref={item} style={[{ width: 40 }]}>
+      <Animated.View ref={item} style={[{ width: smallDim.width }]}>
         <Amplify
-          height={120}
-          width={40}
-          borderRadius={6}
+          height={smallDim.height}
+          width={smallDim.width}
+          borderRadius={smallDim.borderRadius}
           initialValue={value}
           onChange={setAmplifyValue}
         />
