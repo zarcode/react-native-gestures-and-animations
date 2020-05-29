@@ -24,19 +24,22 @@ const IOSAmply = () => {
     []
   );
 
-  const open = (p: Position, v: number) => {
+  const open = useCallback((p: Position, v: number) => {
     setValue(v);
     setPosition(p);
-  };
+  }, []);
 
   const close = useCallback(() => {
     setPosition(null);
   }, []);
 
-  const prepareForClose = (v) => {
-    setValue(v);
-    shouldClose.setValue(1);
-  };
+  const prepareForClose = useCallback(
+    (v) => {
+      setValue(v);
+      shouldClose.setValue(1);
+    },
+    [shouldClose]
+  );
 
   // when position is set to null prepare for opening
   useEffect(() => {
