@@ -6,13 +6,13 @@ export interface Position {
 }
 
 export const smallDim = {
-  height: 120,
-  width: 40,
-  borderRadius: 6,
+  height: 160,
+  width: 70,
+  borderRadius: 18,
 };
 
 export const largeDim = {
-  height: 300,
-  width: 100,
-  borderRadius: 15,
+  height: 400,
+  width: 150,
+  borderRadius: 36,
 };

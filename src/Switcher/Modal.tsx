@@ -12,10 +12,6 @@ import { Position, largeDim, smallDim } from "./Model";
 import { createValue, timing, timingBack } from "./Timing";
 
 const { width: wWidth, height: wHeight } = Dimensions.get("window");
-const sliderWidth = 100;
-const sliderHeight = 300;
-const sliderX = (wWidth - sliderWidth) / 2;
-const sliderY = (wHeight - sliderHeight) / 2;
 
 const { cond, eq, useCode, clockRunning, block, call } = Animated;
 
@@ -44,7 +40,7 @@ const Modal = ({
       y: createValue(position.y),
       opacity: createValue(0),
       // scale: createValue(1),
-      borderRadius: createValue(6),
+      borderRadius: createValue(smallDim.borderRadius),
     }),
     [position.width, position.height, position.x, position.y]
   );
@@ -57,26 +53,33 @@ const Modal = ({
     top: y.value,
   };
 
+  const sliderX = (wWidth - largeDim.width) / 2;
+  const sliderY = (wHeight - largeDim.height) / 2;
+
   useCode(
     () =>
       block([
         cond(
           shouldClose,
           [
-            timingBack(width, sliderWidth, position.width),
-            timingBack(height, sliderHeight, position.height),
+            timingBack(width, largeDim.width, position.width),
+            timingBack(height, largeDim.height, position.height),
             timingBack(x, sliderX, position.x),
             timingBack(y, sliderY, position.y),
-            timingBack(borderRadius, 15, 6),
+            timingBack(
+              borderRadius,
+              largeDim.borderRadius,
+              smallDim.borderRadius
+            ),
             timingBack(opacity, 1, 0),
             cond(eq(clockRunning(width.clock), 0), call([], close)),
           ],
           [
-            timing(width, position.width, sliderWidth),
-            timing(height, position.height, sliderHeight),
+            timing(width, position.width, largeDim.width),
+            timing(height, position.height, largeDim.height),
             timing(x, position.x, sliderX),
             timing(y, position.y, sliderY),
-            timing(borderRadius, 6, 15),
+            timing(borderRadius, smallDim.borderRadius, largeDim.borderRadius),
             timing(opacity, 0, 1),
             // cond(eq(clockRunning(width.clock), 0), call([], setOpened)),
           ]
