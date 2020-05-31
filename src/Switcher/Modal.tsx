@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   Dimensions,
   StyleSheet,
@@ -22,6 +22,44 @@ interface ModalProps {
   shouldClose: Animated.Value<0 | 1>;
   value: number;
 }
+
+const renderWrapper = (p, borderRadius, opacity, value) => ({ children }) => (
+  <Animated.View
+    style={[
+      p,
+      {
+        borderRadius: borderRadius.value,
+        overflow: "hidden",
+      },
+    ]}
+  >
+    <View style={[StyleSheet.absoluteFill, { backgroundColor: "black" }]}>
+      <View
+        style={[
+          {
+            position: "absolute",
+            left: 0,
+            bottom: 0,
+            right: 0,
+            height: (value * smallDim.height) / 100,
+            backgroundColor: "red",
+          },
+        ]}
+      />
+    </View>
+    <Animated.View
+      style={[
+        {
+          zIndex: 1,
+          opacity: opacity.value,
+          // borderRadius: borderRadius.value
+        },
+      ]}
+    >
+      {children}
+    </Animated.View>
+  </Animated.View>
+);
 
 const Modal = ({
   close,
@@ -88,55 +126,27 @@ const Modal = ({
     [width, height, position, borderRadius, shouldClose, opacity, x, y, close]
   );
 
+  const Wrapper = useCallback((props) => {
+    return renderWrapper(p, borderRadius, opacity, value)(props);
+  }, []);
+
   return (
-    <>
+    <View style={[StyleSheet.absoluteFill]}>
       <TouchableWithoutFeedback onPress={() => prepareForClose(amplifyValue)}>
         <Animated.View
           style={[StyleSheet.absoluteFill, { backgroundColor: "yellow" }]}
         />
       </TouchableWithoutFeedback>
-      <Animated.View
-        style={[
-          p,
-          {
-            borderRadius: borderRadius.value,
-            overflow: "hidden",
-          },
-        ]}
-      >
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: "black" }]}>
-          <View
-            style={[
-              {
-                position: "absolute",
-                left: 0,
-                bottom: 0,
-                right: 0,
-                height: (value * smallDim.height) / 100,
-                backgroundColor: "red",
-              },
-            ]}
-          />
-        </View>
-        <Animated.View
-          style={[
-            {
-              zIndex: 1,
-              opacity: opacity.value,
-              // borderRadius: borderRadius.value
-            },
-          ]}
-        >
-          <Amplify
-            height={largeDim.height}
-            width={largeDim.width}
-            borderRadius={largeDim.borderRadius}
-            initialValue={value}
-            onChange={setAmplifyValue}
-          />
-        </Animated.View>
-      </Animated.View>
-    </>
+      <Amplify
+        inModal
+        height={largeDim.height}
+        width={largeDim.width}
+        borderRadius={largeDim.borderRadius}
+        initialValue={value}
+        onChange={setAmplifyValue}
+        Wrapper={Wrapper}
+      />
+    </View>
   );
 };
 

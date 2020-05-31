@@ -24,6 +24,8 @@ interface ControlProps {
   value: number;
 }
 
+const Wrapper = ({ children }) => [children];
+
 const Control = ({ open, value }: ControlProps) => {
   const [amplifyValue, setAmplifyValue] = useState(value);
 
@@ -42,11 +44,13 @@ const Control = ({ open, value }: ControlProps) => {
     <TouchableWithoutFeedback onLongPress={startTransition}>
       <Animated.View ref={item} style={[{ width: smallDim.width }]}>
         <Amplify
+          inModal={false}
           height={smallDim.height}
           width={smallDim.width}
           borderRadius={smallDim.borderRadius}
           initialValue={value}
           onChange={setAmplifyValue}
+          Wrapper={Wrapper}
         />
       </Animated.View>
     </TouchableWithoutFeedback>

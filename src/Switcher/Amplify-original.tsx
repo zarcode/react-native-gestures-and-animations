@@ -1,34 +1,8 @@
 import React, { useRef } from "react";
-import { View } from "react-native";
 import { PanGestureHandler, State } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { useMemoOne } from "use-memo-one";
 import { diffClamp, onGestureEvent } from "react-native-redash";
-import Sun from "./Sun";
-
-const Icon = ({ scale, translateY, itemsHeight, wrapStyle, color }) => (
-  <View
-    style={[
-      {
-        position: "absolute",
-        bottom: 0,
-        left: 0,
-        width: "100%",
-        height: "30%",
-        alignItems: "center",
-        justifyContent: "center",
-      },
-      wrapStyle,
-    ]}
-  >
-    <Sun
-      maxValue={itemsHeight}
-      translateY={translateY}
-      color={color}
-      scale={scale}
-    />
-  </View>
-);
 
 const { Value, cond, set, eq, add, sub, block, useCode, call } = Animated;
 
@@ -62,7 +36,6 @@ interface AmplifyProps {
   borderRadius: number;
   initialValue: number;
   onChange: (value: number) => void;
-  inModal?: boolean;
 }
 
 const Amplify = ({
@@ -71,8 +44,6 @@ const Amplify = ({
   borderRadius: itemBorderRadius,
   initialValue,
   onChange,
-  inModal,
-  Wrapper,
 }: AmplifyProps) => {
   const initialTranslationY = ((100 - initialValue) * itemsHeight) / 100;
 
@@ -113,47 +84,28 @@ const Amplify = ({
   }, [translateY, onChange, initialValue, itemsHeight]);
 
   return (
-    <View>
-      {inModal && (
-        <Icon
-          color="black"
-          scale={0.1}
-          wrapStyle={{ top: "auto", bottom: "auto", height: "auto" }}
-          {...{ translateY, itemsHeight }}
+    <PanGestureHandler {...gestureHandler} key={initialValue}>
+      <Animated.View
+        style={{
+          width: itemWidth,
+          height: itemsHeight,
+          backgroundColor: "black",
+          borderRadius: itemBorderRadius,
+          overflow: "hidden",
+        }}
+      >
+        <Animated.View
+          style={{
+            position: "absolute",
+            left: 0,
+            bottom: 0,
+            width: itemWidth,
+            height: sub(itemsHeight, translateY),
+            backgroundColor: "red",
+          }}
         />
-      )}
-      <Wrapper>
-        <PanGestureHandler {...gestureHandler} key={initialValue}>
-          <Animated.View
-            style={{
-              width: itemWidth,
-              height: itemsHeight,
-              backgroundColor: "black",
-              borderRadius: itemBorderRadius,
-              overflow: "hidden",
-            }}
-          >
-            <Animated.View
-              style={{
-                position: "absolute",
-                left: 0,
-                bottom: 0,
-                width: itemWidth,
-                height: sub(itemsHeight, translateY),
-                backgroundColor: "red",
-              }}
-            />
-            {!inModal && (
-              <Icon
-                color="yellow"
-                scale={0.089}
-                {...{ translateY, itemsHeight }}
-              />
-            )}
-          </Animated.View>
-        </PanGestureHandler>
-      </Wrapper>
-    </View>
+      </Animated.View>
+    </PanGestureHandler>
   );
 };
 
